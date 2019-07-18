@@ -24084,9 +24084,15 @@ function (_Component) {
   _createClass(Artists, [{
     key: "render",
     value: function render() {
-      var href = this.props.artist.href;
-      console.log(' this.props.artist', this.props.artist);
-      return _react.default.createElement("div", null, href);
+      var _this$props$artist = this.props.artist,
+          href = _this$props$artist.href,
+          items = _this$props$artist.items;
+      return _react.default.createElement("div", null, Object.entries(this.props.artist).length !== 0 ? this.props.artist.items.map(function (a) {
+        return _react.default.createElement(Item, {
+          key: a.id,
+          item: a
+        });
+      }) : null);
     }
   }]);
 
@@ -24094,7 +24100,32 @@ function (_Component) {
 }(_react.Component);
 
 var Item = function Item(props) {
-  return _react.default.createElement("p", null, "props.name");
+  var genres = [];
+  genres = props.item.genres;
+  var images = [];
+  images = props.item.images;
+  return _react.default.createElement("div", null, images.map(function (i) {
+    return _react.default.createElement(Image, {
+      key: i.id,
+      image: i
+    });
+  }), _react.default.createElement("p", null, props.item.name), genres.map(function (g) {
+    return _react.default.createElement(Genre, {
+      key: g.id,
+      genre: g
+    });
+  }), _react.default.createElement("p", null, props.item.href), _react.default.createElement("p", null, props.item.followers.total));
+};
+
+var Image = function Image(props) {
+  return _react.default.createElement("div", null, _react.default.createElement("p", null, props.image.height == 160 ? _react.default.createElement("img", {
+    src: props.image.url,
+    alt: "image"
+  }) : null));
+};
+
+var Genre = function Genre(props) {
+  return _react.default.createElement("div", null, _react.default.createElement("p", null, props.genre));
 };
 
 var _default = Artists;
@@ -24155,12 +24186,10 @@ function (_Component) {
 
     _defineProperty(_assertThisInitialized(_this), "state", {
       artistQuery: '',
-      artists: {}
+      artist: {}
     });
 
     _defineProperty(_assertThisInitialized(_this), "updateArtistQuery", function (event) {
-      console.log('event.target.value', event.target.value);
-
       _this.setState({
         artistQuery: event.target.value
       });
@@ -24169,24 +24198,24 @@ function (_Component) {
     _defineProperty(_assertThisInitialized(_this), "handleKeyPress", function (event) {
       if (event.key === 'Enter') {
         _this.searchArtist();
-
-        console.log('this.state.artists', _this.state.artists);
       }
     });
 
     _defineProperty(_assertThisInitialized(_this), "searchArtist", function () {
-      fetch('https://spotify-api-wrapper.appspot.com/artist/bruno').then(function (response) {
+      fetch('https://spotify-api-wrapper.appspot.com/artist/' + _this.state.artistQuery).then(function (response) {
         return response.json();
       }).then(function (json) {
-        // console.log('json', json);
-        // console.log('json.artists', json.artists);
-        // console.log('json.artists.href', json.artists.href);
+        console.log('json.artists', json.artists);
         return _this.setState({
-          artists: json.artists
+          artist: json.artists
         });
       }).catch(function (error) {
         return alert(error.message);
       });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "getTracks", function () {
+      console.log('externalURL', _this.state.artist);
     });
 
     return _this;
@@ -24202,8 +24231,10 @@ function (_Component) {
       }), _react.default.createElement("button", {
         onClick: this.searchArtist
       }, "Search"), _react.default.createElement("div", null, "Artist Details"), _react.default.createElement(_Artists.default, {
-        artist: this.state.artists
-      }));
+        artist: this.state.artist
+      }), _react.default.createElement("button", {
+        onClick: this.getTracks
+      }, "Tracks"));
     }
   }]);
 
@@ -24325,7 +24356,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63075" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53287" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
